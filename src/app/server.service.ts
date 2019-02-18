@@ -23,16 +23,16 @@ export class ServerService {
 }
 
   getServers() {
-    return this.http.get('https://udemy-ng-http-dc6f2.firebaseio.com/data.json').pipe(map(
+    return this.http.get('https://udemy-ng-http-dc6f2.firebaseio.com/data').pipe(map(
       (response) => {
         const data = response.json();
         return data;
       }
-    ));
-/*      .pipe(catchError(error => {
+    ))
+      .pipe(catchError(error => {
       console.log(error);
       return throwError('Something went wrong');
-    });*/
+    }));
   }
 
   getAppName() {
