@@ -1,13 +1,12 @@
-import {Component, OnDestroy} from '@angular/core';
+import {Component} from '@angular/core';
 import {ServerService} from './server.service';
-import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnDestroy {
+export class AppComponent {
   servers = [
     {
       name: 'Testserver',
@@ -21,9 +20,6 @@ export class AppComponent implements OnDestroy {
     }
   ];
 
-  appName = this.serverServ.getAppName();
-
-  httpSubscription: Subscription;
 
   constructor(private serverServ: ServerService) {}
 
@@ -34,12 +30,13 @@ export class AppComponent implements OnDestroy {
       id: this.generateId()
     });
   }
+
   private generateId() {
     return Math.round(Math.random() * 10000);
   }
 
   onSave() {
-    this.httpSubscription = this.serverServ.storeServers(this.servers).subscribe(
+    this.serverServ.storeServers(this.servers).subscribe(
       (response) => console.log(response),
       (error) => console.log(error)
   );
@@ -47,12 +44,12 @@ export class AppComponent implements OnDestroy {
 
   onGet() {
     this.serverServ.getServers().subscribe(
-      (servers) => console.log(servers),
+      (servers) => {
+        this.servers = servers;
+        console.log(servers);
+      },
       (error) => console.log(error)
     );
   }
 
-  ngOnDestroy(): void {
-    this.httpSubscription.unsubscribe();
-  }
 }

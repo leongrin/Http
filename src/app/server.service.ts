@@ -1,44 +1,44 @@
-import { Injectable } from '@angular/core';
-import {Http, Headers} from '@angular/http';
+import {Injectable} from '@angular/core';
 import {catchError, map} from 'rxjs/operators';
 import {throwError} from 'rxjs';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ServerService {
 
-  constructor(private http: Http) { }
+  // This header and Params are just an example. They are not necessary, and might generate errors.
+  allowOriginHeader = new HttpHeaders().set('key', 'Access-Control-Allow-Origin');
+  exampleParams = new HttpParams().set('auth', 'test token').append('more', 'test value');
+
+  constructor(private http: HttpClient) { }
 
   storeServers(servers: any[]) {
-    const headers = new Headers({'Content-Type': 'application/json'});
-/*    return this.http.post(
-      'https://udemy-ng-http-dc6f2.firebaseio.com/data.json',
-      servers,
-      {headers: headers});*/
     return this.http.put(
       'https://udemy-ng-http-dc6f2.firebaseio.com/data.json',
       servers,
-      {headers: headers});
+      {
+        headers: this.allowOriginHeader,
+        /*params: this.exampleParams*/
+      });
 }
 
   getServers() {
-    return this.http.get('https://udemy-ng-http-dc6f2.firebaseio.com/data').pipe(map(
+    return this.http.get<any[]>('https://udemy-ng-http-dc6f2.firebaseio.com/data.json', {
+      headers: this.allowOriginHeader
+    })
+      .pipe(map(
       (response) => {
-        const data = response.json();
-        return data;
-      }
-    ))
+        for (const item of response) {
+          item.name = 'Change: ' + item.name;
+        }
+        return response;
+      }))
       .pipe(catchError(error => {
       console.log(error);
-      return throwError('Something went wrong');
+      return throwError('Something went VERY VERY wrong');
     }));
-  }
-
-  getAppName() {
-    return this.http.get('https://udemy-ng-http-dc6f2.firebaseio.com/appName.json').pipe(map(
-      response => response.json()
-    ));
   }
 
 }
